@@ -21,7 +21,9 @@ namespace ContactManager
                 {
                     var context = services.GetRequiredService<ApplicationDbContext>();
                     context.Database.Migrate();
-                    SeedData.Initialize(context,"");
+                    //var testUserPw = Configuration["SeedUserPW"];
+
+                    SeedData.Initialize(services, "12wq!@WQ").Wait();
                 }
                 catch (Exception ex)
                 {
