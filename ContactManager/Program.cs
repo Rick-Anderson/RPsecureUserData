@@ -23,7 +23,7 @@ namespace ContactManager
                     context.Database.Migrate();
                     //var testUserPw = Configuration["SeedUserPW"];
 
-                    SeedData.Initialize(services, "12wq!@WQ").Wait();
+                    SeedData.Initialize(services, "Pa$$w0rd123").Wait();
                 }
                 catch (Exception ex)
                 {
