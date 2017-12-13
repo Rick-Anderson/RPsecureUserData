@@ -15,32 +15,60 @@ namespace ContactManager.Data
         {
             using ( context)
             {
-               // var uid = await CreateTestUser(serviceProvider, testUserPw);
-                SeedDB(context);
+                // For sample purposes we are seeding 2 users both with the same password.
+                // The password is set with the following command:
+                // dotnet user-secrets set SeedUserPW <pw>
+                // The admin user can do anything
+
+                //var adminID = await EnsureUser(serviceProvider, testUserPw, "admin@contoso.com");
+                //await EnsureRole(serviceProvider, adminID, Constants.ContactAdministratorsRole);
+
+                //// allowed user can create and edit contacts that they create
+                //var uid = await EnsureUser(serviceProvider, testUserPw, "manager@contoso.com");
+                //await EnsureRole(serviceProvider, uid, Constants.ContactManagersRole);
+
+                string adminID = "1234";
+
+                SeedDB(context, adminID);
             }
         }
 
-        private static async Task<string> CreateTestUser(IServiceProvider serviceProvider, 
-            string testUserPw)
+        private static async Task<string> EnsureUser(IServiceProvider serviceProvider,
+                                                    string testUserPw, string UserName)
         {
-            if (String.IsNullOrEmpty(testUserPw))
-                return "";
-
-            const string SeedUserName = "test@example.com";
-
             var userManager = serviceProvider.GetService<UserManager<ApplicationUser>>();
 
-            var user = await userManager.FindByNameAsync(SeedUserName);
+            var user = await userManager.FindByNameAsync(UserName);
             if (user == null)
             {
-                user = new ApplicationUser { UserName = SeedUserName };
+                user = new ApplicationUser { UserName = UserName };
                 await userManager.CreateAsync(user, testUserPw);
             }
 
             return user.Id;
         }
 
-        public static void SeedDB(ApplicationDbContext context)
+        private static async Task<IdentityResult> EnsureRole(IServiceProvider serviceProvider,
+                                                                      string uid, string role)
+        {
+            IdentityResult IR = null;
+            var roleManager = serviceProvider.GetService<RoleManager<IdentityRole>>();
+
+            if (!await roleManager.RoleExistsAsync(role))
+            {
+                IR = await roleManager.CreateAsync(new IdentityRole(role));
+            }
+
+            var userManager = serviceProvider.GetService<UserManager<ApplicationUser>>();
+
+            var user = await userManager.FindByIdAsync(uid);
+
+            IR = await userManager.AddToRoleAsync(user, role);
+
+            return IR;
+        }
+
+        public static void SeedDB(ApplicationDbContext context, string adminID)
         {
             if (context.Contact.Any())
             {
@@ -55,17 +83,21 @@ namespace ContactManager.Data
                     City = "Redmond",
                     State = "WA",
                     Zip = "10999",
-                    Email = "debra@example.com"
+                    Email = "debra@example.com",
+                    Status = ContactStatus.Approved,
+                    OwnerID = adminID
                 },
-             new Contact
-             {
-                 Name = "Thorsten Weinrich",
-                 Address = "5678 1st Ave W",
-                 City = "Redmond",
-                 State = "WA",
-                 Zip = "10999",
-                 Email = "thorsten@example.com"
-             },
+                new Contact
+                {
+                    Name = "Thorsten Weinrich",
+                    Address = "5678 1st Ave W",
+                    City = "Redmond",
+                    State = "WA",
+                    Zip = "10999",
+                    Email = "thorsten@example.com",
+                    Status = ContactStatus.Approved,
+                    OwnerID = adminID
+                },
              new Contact
              {
                  Name = "Yuhong Li",
@@ -73,7 +105,9 @@ namespace ContactManager.Data
                  City = "Redmond",
                  State = "WA",
                  Zip = "10999",
-                 Email = "yuhong@example.com"
+                 Email = "yuhong@example.com",
+                 Status = ContactStatus.Approved,
+                 OwnerID = adminID
              },
              new Contact
              {
@@ -82,7 +116,8 @@ namespace ContactManager.Data
                  City = "Redmond",
                  State = "WA",
                  Zip = "10999",
-                 Email = "jon@example.com"
+                 Email = "jon@example.com",
+                 OwnerID = adminID
              },
              new Contact
              {
@@ -91,7 +126,8 @@ namespace ContactManager.Data
                  City = "Redmond",
                  State = "WA",
                  Zip = "10999",
-                 Email = "diliana@example.com"
+                 Email = "diliana@example.com",
+                 OwnerID = adminID
              }
              );
             context.SaveChanges();
