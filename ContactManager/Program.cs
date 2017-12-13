@@ -1,14 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
-using ContactManager.Data;
+﻿using ContactManager.Data;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using System;
 
 namespace ContactManager
 {
@@ -24,6 +20,7 @@ namespace ContactManager
                 try
                 {
                     var context = services.GetRequiredService<ApplicationDbContext>();
+                    context.Database.Migrate();
                     SeedData.Initialize(context,"");
                 }
                 catch (Exception ex)
