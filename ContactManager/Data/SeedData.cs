@@ -44,7 +44,12 @@ namespace ContactManager.Data
             if (user == null)
             {
                 user = new ApplicationUser { UserName = UserName };
-                await userManager.CreateAsync(user, testUserPw);
+                IdentityResult IR = await userManager.CreateAsync(user, testUserPw);
+                if (IR.Succeeded != true)
+                {
+                    var msg = IR.ToString();
+                    throw new Exception(msg);
+                }
             }
 
             return user.Id;
