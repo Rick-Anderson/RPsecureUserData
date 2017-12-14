@@ -25,7 +25,9 @@ namespace ContactManager
                 context.Database.Migrate();
                 // Set password with the Secret Manager tool.
                 // dotnet user-secrets set SeedUserPW <pw>
-                var testUserPw = Configuration["SeedUserPW"];
+
+                //var testUserPw = Configuration["SeedUserPW"];
+                var testUserPw = "PaSSw0rd123";
 
                 SeedData.Initialize(services, testUserPw).Wait();
             }

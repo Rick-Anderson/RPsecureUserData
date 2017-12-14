@@ -63,12 +63,30 @@ namespace ContactManager
 
             app.UseAuthentication();
 
-            app.UseMvc(routes =>
+            app.UseMvcWithDefaultRoute();
+
+            // Set password with the Secret Manager tool.
+            // dotnet user-secrets set SeedUserPW <pw>
+            var testUserPw = Configuration["SeedUserPW"];
+
+            if (String.IsNullOrEmpty(testUserPw))
             {
-                routes.MapRoute(
-                    name: "default",
-                    template: "{controller}/{action=Index}/{id?}");
-            });
+                throw new System.Exception("Use secrets manager to set SeedUserPW \n" +
+                                           "dotnet user-secrets set SeedUserPW <pw>");
+            }
+
+            //try
+            //{
+                SeedData.Initialize(app.ApplicationServices, testUserPw).Wait();
+            //}
+            //catch
+            //{
+            //    throw new System.Exception("You need to update the DB "
+            //        + "\nPM > Update-Database " + "\n or \n" +
+            //          "> dotnet ef database update"
+            //          + "\nIf that doesn't work, comment out SeedData and "
+            //          + "register a new user");
+            //}
         }
     }
 }
