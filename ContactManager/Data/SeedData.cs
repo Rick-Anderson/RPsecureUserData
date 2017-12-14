@@ -30,7 +30,6 @@ namespace ContactManager.Data
                 var uid = await EnsureUser(serviceProvider, testUserPw, "manager@contoso.com");
                 await EnsureRole(serviceProvider, uid, Constants.ContactManagersRole);
 
-
                 SeedDB(context, adminID);
             }
         }
@@ -47,15 +46,15 @@ namespace ContactManager.Data
                 IdentityResult IR = await userManager.CreateAsync(user, testUserPw);
                 if (IR.Succeeded != true)
                 {
-                    var msg = IR.ToString();
-                    throw new Exception(msg);
+                    // Fails if password doesn't meet commplexity requirements.
+                    throw new Exception(IR.ToString());
                 }
             }
 
             return user.Id;
         }
 
-        private static async Task<IdentityResult> EnsureRole(IServiceProvider serviceProvider,
+        private static async Task EnsureRole(IServiceProvider serviceProvider,
                                                                       string uid, string role)
         {
             IdentityResult IR = null;
@@ -65,14 +64,21 @@ namespace ContactManager.Data
             {
                 IR = await roleManager.CreateAsync(new IdentityRole(role));
             }
+            if (IR.Succeeded != true)
+            {
+                throw new Exception(IR.ToString());
+            }
 
             var userManager = serviceProvider.GetService<UserManager<ApplicationUser>>();
 
             var user = await userManager.FindByIdAsync(uid);
 
             IR = await userManager.AddToRoleAsync(user, role);
+            if (IR.Succeeded != true)
+            {
+                throw new Exception(IR.ToString());
+            }
 
-            return IR;
         }
 
         public static void SeedDB(ApplicationDbContext context, string adminID)
