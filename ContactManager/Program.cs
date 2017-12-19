@@ -11,11 +11,6 @@ namespace ContactManager
 {
     public class Program
     {
-        public static IConfiguration Configuration
-        {
-            get; set;
-        }
-
         public static void Main(string[] args)
         {
             var host = BuildWebHost(args);
@@ -31,7 +26,7 @@ namespace ContactManager
                 // dotnet user-secrets set SeedUserPW <pw>
 
                 var testUserPw = config["SeedUserPW"];
-                //var testUserPw = "PaSSw0rd123";
+
                 try { 
                 SeedData.Initialize(services, testUserPw).Wait();
                 }

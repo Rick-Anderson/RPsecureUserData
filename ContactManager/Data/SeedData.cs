@@ -55,7 +55,7 @@ namespace ContactManager.Data
         }
 
         private static async Task EnsureRole(IServiceProvider serviceProvider,
-                                                                      string uid, string role)
+                                                        string uid, string role)
         {
             IdentityResult IR = null;
             var roleManager = serviceProvider.GetService<RoleManager<IdentityRole>>();
